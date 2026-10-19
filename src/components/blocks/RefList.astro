@@ -1,0 +1,38 @@
+---
+import type { Block, BlockPayload } from '../../lib/content';
+
+interface Props {
+    labels?: string[];
+    payload?: BlockPayload;
+    block?: Block;
+}
+
+const { labels = [], payload, block } = Astro.props;
+
+const items = labels.length > 0 ? labels : (payload?.labels ?? []);
+const icon = block?.type === 'quiz_ref' ? '❓' : block?.type === 'card_refs' ? '🃏' : block?.type === 'interview_ref' ? '🎤' : '✏️';
+const title =
+    block?.type === 'quiz_ref'
+        ? 'Quiz questions'
+        : block?.type === 'card_refs'
+            ? 'Flashcards'
+            : block?.type === 'interview_ref'
+                ? 'Interview questions'
+                : 'Exercises';
+---
+
+<div class="my-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+    <p class="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+        {icon} {title} <span class="font-normal normal-case">({items.length}) — interactive versions live in the full app</span>
+    </p>
+    <ul class="mt-2 space-y-1.5">
+        {
+            items.map((label) => (
+                <li class="flex items-start gap-2 text-sm text-zinc-300">
+                    <span class="mt-0.5 text-zinc-600">•</span>
+                    <span class="leading-6">{label}</span>
+                </li>
+            ))
+        }
+    </ul>
+</div>

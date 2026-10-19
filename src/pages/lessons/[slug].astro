@@ -1,0 +1,163 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlockRenderer from '../../components/BlockRenderer.astro';
+import Citation from '../../components/Citation.astro';
+import SourceBadge from '../../components/SourceBadge.astro';
+import DiagramCard from '../../components/blocks/Diagram.astro';
+import { loadLesson, lessonNeighbours, manifest, structure } from '../../lib/content';
+
+export async function getStaticPaths() {
+    return manifest.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const payload = await loadLesson(entry.slug);
+
+if (!payload) {
+    return Astro.redirect('/404');
+}
+
+const { lesson, blocks, code_examples: codeExamples, diagrams, diagram_ids } = payload;
+const { prev, next } = lessonNeighbours(entry.slug);
+const currentChapter = structure.chapters.find((chapter) => chapter.number === lesson.chapter?.number);
+const position = manifest.findIndex((item) => item.slug === lesson.slug) + 1;
+const lessonDiagrams = diagram_ids.map((id) => diagrams[String(id)]).filter(Boolean);
+---
+
+<Base title={`${lesson.title} — PHP Learning Platform`} description={lesson.summary}>
+    <div class="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <aside class="hidden lg:block">
+            <div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pe-2">
+                <p class="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Contents</p>
+                <nav class="space-y-1 text-sm">
+                    {
+                        structure.chapters.map((chapter) => (
+                            <details open={chapter.id === currentChapter?.id}>
+                                <summary class="cursor-pointer list-none rounded-lg px-2 py-1.5 font-medium text-zinc-300 transition hover:bg-zinc-900 hover:text-zinc-100">
+                                    <span class="font-mono text-xs text-zinc-500">{chapter.number}.</span> {chapter.title}
+                                </summary>
+                                <div class="ms-3 border-s border-zinc-800 ps-2">
+                                    {chapter.sections.map((section) => (
+                                        <div>
+                                            {section.title && (
+                                                <p class="mt-1 px-2 text-xs text-zinc-500" title={section.title}>
+                                                    {section.title}
+                                                </p>
+                                            )}
+                                            {section.lessons.map((item) => (
+                                                <a
+                                                    href={`/lessons/${item.slug}/`}
+                                                    class:list={[
+                                                        'block truncate rounded-lg px-2 py-1 transition',
+                                                        item.slug === lesson.slug
+                                                            ? 'bg-violet-600/20 font-semibold text-violet-300'
+                                                            : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100',
+                                                    ]}
+                                                    title={item.title}
+                                                >
+                                                    {item.title}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    ))}
+                                    {chapter.lessons.map((item) => (
+                                        <a
+                                            href={`/lessons/${item.slug}/`}
+                                            class:list={[
+                                                'block truncate rounded-lg px-2 py-1 transition',
+                                                item.slug === lesson.slug
+                                                    ? 'bg-violet-600/20 font-semibold text-violet-300'
+                                                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100',
+                                            ]}
+                                            title={item.title}
+                                        >
+                                            {item.title}
+                                        </a>
+                                    ))}
+                                </div>
+                            </details>
+                        ))
+                    }
+                </nav>
+            </div>
+        </aside>
+
+        <article class="mx-auto w-full max-w-3xl">
+            <a href="/lessons/" class="text-sm text-violet-400 hover:underline">&larr; All lessons</a>
+
+            <header class="mt-4 border-b border-zinc-800 pb-6">
+                <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                    {lesson.stage && <span class="rounded-full bg-zinc-900 px-2.5 py-1 font-medium text-zinc-300">{lesson.stage.name}</span>}
+                    {lesson.chapter && (
+                        <span class="rounded-full bg-zinc-900 px-2.5 py-1 font-medium text-zinc-300">Ch. {lesson.chapter.number} · {lesson.chapter.title}</span>
+                    )}
+                    <SourceBadge source={lesson.source} />
+                    <span>~{lesson.est_minutes} min read</span>
+                    <span class="text-zinc-600">Lesson {position} of {manifest.length}</span>
+                </div>
+                <h1 class="mt-4 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">{lesson.title}</h1>
+                <p class="mt-3 text-lg leading-relaxed text-zinc-400">{lesson.summary}</p>
+                <div class="mt-4 flex items-center gap-3 text-sm">
+                    <Citation citation={lesson.citation} />
+                    {lesson.is_outdated && (
+                        <span class="rounded-full bg-amber-900/40 px-2 py-0.5 text-xs font-medium text-amber-200">Contains outdated content</span>
+                    )}
+                </div>
+            </header>
+
+            <div class="mt-8">
+                {blocks.map((block) => <BlockRenderer block={block} codeExamples={codeExamples} diagrams={diagrams} />)}
+            </div>
+
+            {
+                lessonDiagrams.length > 0 && (
+                    <section class="mt-12 border-t border-zinc-800 pt-8">
+                        <h2 class="text-xl font-bold text-zinc-50">Diagrams</h2>
+                        <p class="mt-1 text-sm text-zinc-500">Concept diagrams for this lesson (rendered with Mermaid, like the full app).</p>
+                        <div class="mt-4">
+                            {lessonDiagrams.map((diagram) => (
+                                <DiagramCard diagram={diagram} />
+                            ))}
+                        </div>
+                    </section>
+                )
+            }
+
+            <div class="mt-12 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-400">
+                📚 This is a read-only static preview. The full platform adds interactive exercises with a sandboxed code
+                runner, quizzes, flashcards, and mastery tracking for this lesson.
+            </div>
+
+            <nav class="mt-8 flex justify-between gap-4 border-t border-zinc-800 pt-6">
+                {
+                    prev ? (
+                        <a href={`/lessons/${prev.slug}/`} class="text-sm text-violet-400 hover:underline">
+                            ← {prev.title}
+                        </a>
+                    ) : (
+                        <span />
+                    )
+                }
+                {
+                    next ? (
+                        <a href={`/lessons/${next.slug}/`} class="text-right text-sm text-violet-400 hover:underline">
+                            {next.title} →
+                        </a>
+                    ) : (
+                        <span />
+                    )
+                }
+            </nav>
+        </article>
+    </div>
+
+    <script>
+        const nodes = document.querySelectorAll('.mermaid:not([data-processed])');
+        if (nodes.length > 0) {
+            const { default: mermaid } = await import('mermaid');
+            mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+            await mermaid.run({ nodes: nodes as HTMLElement[] });
+            nodes.forEach((node) => node.setAttribute('data-processed', 'true'));
+        }
+    </script>
+</Base>

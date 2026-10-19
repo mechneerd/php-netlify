@@ -1,0 +1,77 @@
+---
+import Heading from './blocks/Heading.astro';
+import Paragraph from './blocks/Paragraph.astro';
+import Bullets from './blocks/Bullets.astro';
+import Callout from './blocks/Callout.astro';
+import Code from './blocks/Code.astro';
+import Output from './blocks/Output.astro';
+import Table from './blocks/Table.astro';
+import Diagram from './blocks/Diagram.astro';
+import BookQuote from './blocks/BookQuote.astro';
+import ModernPanel from './blocks/ModernPanel.astro';
+import PrereqList from './blocks/PrereqList.astro';
+import ExerciseRef from './blocks/ExerciseRef.astro';
+import QuizRef from './blocks/QuizRef.astro';
+import CardRefs from './blocks/CardRefs.astro';
+import InterviewRef from './blocks/InterviewRef.astro';
+import Tabs from './blocks/Tabs.astro';
+import Image from './blocks/Image.astro';
+import CodeExample from './blocks/CodeExample.astro';
+import Fallback from './blocks/Fallback.astro';
+import { tierLabels, type Block, type CodeExample, type Diagram } from '../lib/content';
+
+interface Props {
+    block: Block;
+    codeExamples: Record<string, CodeExample>;
+    diagrams: Record<string, Diagram>;
+}
+
+const { block, codeExamples, diagrams } = Astro.props;
+
+const map: Record<string, any> = {
+    heading: Heading,
+    paragraph: Paragraph,
+    bullets: Bullets,
+    callout: Callout,
+    code: Code,
+    output: Output,
+    table: Table,
+    diagram: Diagram,
+    book_quote: BookQuote,
+    modern_panel: ModernPanel,
+    prereq_list: PrereqList,
+    exercise_ref: ExerciseRef,
+    quiz_ref: QuizRef,
+    card_refs: CardRefs,
+    interview_ref: InterviewRef,
+    tabs: Tabs,
+    image: Image,
+    code_example: CodeExample,
+};
+
+const Component = map[block.type] ?? Fallback;
+const example =
+    block.type === 'code_example' ? codeExamples[String(block.payload.code_example_id)] : undefined;
+const diagram = block.type === 'diagram' ? diagrams[String(block.payload.diagram_id)] : undefined;
+---
+
+{
+    block.collapsed ? (
+        <details class="group/block my-3">
+            <summary class="cursor-pointer list-none rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-zinc-600">
+                <span class="me-2 inline-block text-zinc-500 transition group-open/block:rotate-90">▸</span>
+                {block.type_label}
+                {block.type === 'code_example' && example ? (
+                    <span class="ms-2 text-xs font-normal text-zinc-500">
+                        {example.title} · {tierLabels[example.tier] ?? ''}
+                    </span>
+                ) : null}
+            </summary>
+            <div class="mt-2">
+                <Component block={block} example={example} diagram={diagram} />
+            </div>
+        </details>
+    ) : (
+        <Component block={block} example={example} diagram={diagram} />
+    )
+}

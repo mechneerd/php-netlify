@@ -1,0 +1,13 @@
+---
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+const level = block.payload.level ?? 2;
+const Tag = `h${Math.min(Math.max(level, 2), 4)}`;
+---
+
+<Tag class="mt-8 mb-3 text-xl font-bold text-zinc-50 first:mt-0">{block.payload.text}</Tag>

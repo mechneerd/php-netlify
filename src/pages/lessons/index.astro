@@ -1,0 +1,96 @@
+---
+import Base from '../../layouts/Base.astro';
+import { manifest, structure } from '../../lib/content';
+
+const bySlug = new Map(manifest.map((entry) => [entry.slug, entry]));
+const totalMinutes = manifest.reduce((sum, entry) => sum + entry.est_minutes, 0);
+---
+
+<Base title="Lessons — PHP Learning Platform" description="Every lesson from the PHP learning course: objects, patterns, and practice.">
+    <header class="border-b border-zinc-800 pb-6">
+        <h1 class="text-3xl font-bold text-zinc-50 sm:text-4xl">All lessons</h1>
+        <p class="mt-3 max-w-2xl text-zinc-400">
+            {manifest.length} lessons across {structure.chapters.length} chapters — the complete course, exported
+            from the platform database with full page provenance. Read-only; interactive practice lives in the app.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs text-zinc-400">
+            <span class="rounded-full bg-zinc-900 px-3 py-1">📖 {manifest.length} lessons</span>
+            <span class="rounded-full bg-zinc-900 px-3 py-1">📚 {structure.chapters.length} chapters</span>
+            <span class="rounded-full bg-zinc-900 px-3 py-1">⏱ ~{Math.round(totalMinutes / 60)} h reading time</span>
+        </div>
+    </header>
+
+    <div class="mt-8 space-y-4">
+        {
+            structure.chapters.map((chapter, chapterIndex) => {
+                const chapterLessonSlugs = [
+                    ...chapter.sections.flatMap((section) => section.lessons.map((lesson) => lesson.slug)),
+                    ...chapter.lessons.map((lesson) => lesson.slug),
+                ];
+                const published = chapterLessonSlugs.filter((slug) => bySlug.has(slug));
+
+                if (published.length === 0) return null;
+
+                return (
+                    <details open={chapterIndex < 2} class="group rounded-2xl border border-zinc-800 bg-zinc-900/40">
+                        <summary class="cursor-pointer list-none px-6 py-4">
+                            <span class="flex items-center justify-between gap-4">
+                                <span>
+                                    <span class="text-xs font-medium uppercase tracking-wider text-violet-400">Chapter {chapter.number}</span>
+                                    <h2 class="mt-0.5 text-lg font-semibold text-zinc-50">{chapter.title}</h2>
+                                </span>
+                                <span class="flex items-center gap-3 text-sm text-zinc-500">
+                                    <span>{published.length} lessons</span>
+                                    <span class="transition group-open:rotate-90">▸</span>
+                                </span>
+                            </span>
+                        </summary>
+                        <div class="border-t border-zinc-800 px-6 py-4">
+                            {chapter.sections.map((section) => {
+                                const sectionLessons = section.lessons.filter((lesson) => bySlug.has(lesson.slug));
+                                if (sectionLessons.length === 0) return null;
+                                return (
+                                    <div class="mb-4 last:mb-0">
+                                        {section.title && <p class="mb-2 text-xs font-medium tracking-wide text-zinc-500 uppercase">{section.title}</p>}
+                                        <ul class="space-y-1">
+                                            {sectionLessons.map((item) => {
+                                                const entry = bySlug.get(item.slug)!;
+                                                return (
+                                                    <li>
+                                                        <a
+                                                            href={`/lessons/${item.slug}/`}
+                                                            class="group flex items-baseline justify-between gap-4 rounded-lg px-3 py-2 transition hover:bg-zinc-900"
+                                                        >
+                                                            <span class="truncate text-sm text-zinc-300 group-hover:text-violet-300">{item.title}</span>
+                                                            <span class="shrink-0 font-mono text-xs text-zinc-600">{entry.est_minutes} min</span>
+                                                        </a>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                );
+                            })}
+                            {chapter.lessons.filter((lesson) => bySlug.has(lesson.slug)).length > 0 && (
+                                <ul class="space-y-1">
+                                    {chapter.lessons
+                                        .filter((lesson) => bySlug.has(lesson.slug))
+                                        .map((item) => (
+                                            <li>
+                                                <a
+                                                    href={`/lessons/${item.slug}/`}
+                                                    class="group flex items-baseline justify-between gap-4 rounded-lg px-3 py-2 transition hover:bg-zinc-900"
+                                                >
+                                                    <span class="truncate text-sm text-zinc-300 group-hover:text-violet-300">{item.title}</span>
+                                                </a>
+                                            </li>
+                                        ))}
+                                </ul>
+                            )}
+                        </div>
+                    </details>
+                );
+            })
+        }
+    </div>
+</Base>

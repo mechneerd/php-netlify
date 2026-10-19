@@ -1,0 +1,13 @@
+---
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+---
+
+<div class="my-3 rounded-xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-500">
+    Unsupported block type: <span class="font-mono">{block.type}</span>
+</div>

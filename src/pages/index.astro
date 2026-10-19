@@ -1,0 +1,179 @@
+---
+import { Code } from 'astro:components';
+import Base from '../layouts/Base.astro';
+import { manifest, structure } from '../lib/content';
+
+const heroSnippet = `// value objects never mutate in place
+class Money {
+    public function __construct(
+        private readonly int $amount,
+    ) {}
+
+    public function add(Money $other): static {
+        return new static($this->amount + $other->amount);
+    }
+}`;
+
+const features = [
+    {
+        icon: 'M4 6h16M4 12h10M4 18h7',
+        title: 'Structured path',
+        text: 'Twelve gated stages take you from procedural PHP to design patterns and practice, with a clear prerequisite graph between concepts.',
+    },
+    {
+        icon: 'M9 12l2 2 4-4M12 3a9 9 0 100 18 9 9 0 000-18z',
+        title: 'Mastery, not page views',
+        text: 'Reading, recall, exercises, and debugging each feed an evidence matrix. Levels rise when you prove them — and decay when you idle.',
+    },
+    {
+        icon: 'M8 9l-3 3 3 3M16 9l3 3-3 3M13 6l-2 12',
+        title: 'Safe code execution',
+        text: 'Write real PHP in the browser. Code runs in an isolated sandbox service with time, memory, and output limits — never in the web process.',
+    },
+    {
+        icon: 'M12 8v4l3 3M12 3a9 9 0 100 18 9 9 0 000-18z',
+        title: 'Spaced repetition',
+        text: 'Flashcards, revision queues, and recall scoring schedule themselves, so review happens exactly when memory starts to fade.',
+    },
+    {
+        icon: 'M4 4h16v12H4zM8 20h8',
+        title: 'Book-first content',
+        text: 'Every lesson cites its source chapter and pages. AI-generated material is badged and human-approved before it is ever published.',
+    },
+    {
+        icon: 'M3 3h18v18H3zM9 9h6v6H9z',
+        title: 'Projects & interview mode',
+        text: 'Apply concepts in checklist-driven projects, then pressure-test yourself with self-graded interview questions and an error-pattern library.',
+    },
+];
+
+const stack = ['Laravel 13', 'Livewire 4', 'Flux UI', 'Tailwind CSS 4', 'Fortify', 'SQLite', 'Vite', 'Pest 5', 'PHPStan'];
+
+const totalMinutes = manifest.reduce((sum, entry) => sum + entry.est_minutes, 0);
+const highlighted = manifest.slice(0, 6);
+---
+
+<Base title="PHP Learning Platform — practice-driven PHP mastery">
+    <section class="grid items-center gap-10 py-10 lg:grid-cols-2 lg:py-16">
+        <div>
+            <span
+                class="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-400"
+            >
+                Static companion site · full course inside
+            </span>
+            <h1 class="mt-5 text-4xl font-bold tracking-tight text-zinc-50 sm:text-5xl">
+                Master PHP 8 through
+                <span class="text-violet-400">objects, patterns</span>, and practice.
+            </h1>
+            <p class="mt-5 max-w-xl text-lg leading-relaxed text-zinc-400">
+                A structured, practice-driven course that turns a classic PHP book into an interactive learning
+                platform — with real code execution, mastery tracking, and spaced repetition.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a
+                    href="/lessons/"
+                    class="rounded-lg bg-violet-600 px-6 py-3 font-semibold text-white transition hover:bg-violet-500"
+                >
+                    Browse all {manifest.length} lessons
+                </a>
+                <a
+                    href={`/lessons/${manifest[0]?.slug}/`}
+                    class="rounded-lg border border-zinc-700 px-6 py-3 font-semibold text-zinc-200 transition hover:border-zinc-500 hover:text-zinc-50"
+                >
+                    Start with lesson 1
+                </a>
+            </div>
+            <div class="mt-8 flex flex-wrap gap-2 text-xs text-zinc-400">
+                <span class="rounded-full bg-zinc-900 px-3 py-1">📖 {manifest.length} lessons</span>
+                <span class="rounded-full bg-zinc-900 px-3 py-1">📚 {structure.chapters.length} chapters</span>
+                <span class="rounded-full bg-zinc-900 px-3 py-1">⏱ ~{Math.round(totalMinutes / 60)} h reading</span>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-2 shadow-2xl shadow-violet-950/40">
+            <div class="flex items-center gap-1.5 px-3 py-2">
+                <span class="h-3 w-3 rounded-full bg-red-500/80"></span>
+                <span class="h-3 w-3 rounded-full bg-yellow-500/80"></span>
+                <span class="h-3 w-3 rounded-full bg-green-500/80"></span>
+                <span class="ml-2 font-mono text-xs text-zinc-500">money.php</span>
+            </div>
+            <Code
+                code={heroSnippet}
+                lang="php"
+                theme="github-dark-default"
+                class="overflow-x-auto rounded-xl bg-zinc-950 p-5 font-mono text-sm leading-relaxed"
+            />
+        </div>
+    </section>
+
+    <section id="features" class="scroll-mt-24 py-12">
+        <h2 class="text-2xl font-bold text-zinc-50 sm:text-3xl">Why this platform works</h2>
+        <p class="mt-2 text-zinc-400">Six principles, enforced by the architecture itself.</p>
+        <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {
+                features.map((feature) => (
+                    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-violet-700/60">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-600/20 text-violet-300">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d={feature.icon} />
+                            </svg>
+                        </div>
+                        <h3 class="mt-4 font-semibold text-zinc-50">{feature.title}</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-zinc-400">{feature.text}</p>
+                    </div>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="py-12">
+        <h2 class="text-2xl font-bold text-zinc-50 sm:text-3xl">Start anywhere</h2>
+        <p class="mt-2 text-zinc-400">The first lessons of the course — every one cites its book pages.</p>
+        <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {
+                highlighted.map((lesson) => (
+                    <a
+                        href={`/lessons/${lesson.slug}/`}
+                        class="group rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-violet-700/60"
+                    >
+                        <span class="text-xs font-medium uppercase tracking-wider text-violet-400">
+                            Ch. {lesson.chapter.number} · {lesson.chapter.title}
+                        </span>
+                        <h3 class="mt-2 font-semibold text-zinc-50 group-hover:text-violet-300">{lesson.title}</h3>
+                        <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-zinc-400">{lesson.summary}</p>
+                        <span class="mt-4 inline-block text-sm text-zinc-500">{lesson.est_minutes} min read</span>
+                    </a>
+                ))
+            }
+        </div>
+    </section>
+
+    <section id="stack" class="scroll-mt-24 py-12">
+        <h2 class="text-2xl font-bold text-zinc-50 sm:text-3xl">Built with</h2>
+        <p class="mt-2 text-zinc-400">
+            The full platform is a Laravel application; this site is its static companion.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-2">
+            {
+                stack.map((item) => (
+                    <span class="rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-sm text-zinc-300">
+                        {item}
+                    </span>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="my-12 rounded-2xl border border-violet-800/50 bg-gradient-to-br from-violet-950/60 to-zinc-900 p-10 text-center">
+        <h2 class="text-2xl font-bold text-zinc-50 sm:text-3xl">Ready to go deeper?</h2>
+        <p class="mx-auto mt-3 max-w-xl text-zinc-400">
+            The full platform adds exercises with a sandboxed runner, quizzes, flashcards, a concept graph, and an AI
+            tutor — gated by real mastery.
+        </p>
+        <a
+            href="/lessons/"
+            class="mt-6 inline-block rounded-lg bg-violet-600 px-8 py-3 font-semibold text-white transition hover:bg-violet-500"
+        >
+            Start with lesson 1
+        </a>
+    </section>
+</Base>

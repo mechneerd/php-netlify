@@ -1,0 +1,23 @@
+---
+interface Props {
+    source: string;
+}
+
+const { source } = Astro.props;
+
+const label =
+    source === 'book'
+        ? 'Book'
+        : source === 'book_figure'
+            ? 'Book figure'
+            : source === 'ai'
+                ? 'AI'
+                : source;
+
+const classes =
+    source === 'book' || source === 'book_figure'
+        ? 'bg-amber-900/40 text-amber-200'
+        : 'bg-violet-900/40 text-violet-200';
+---
+
+<span class={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${classes}`}>{label}</span>

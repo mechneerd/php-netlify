@@ -1,0 +1,19 @@
+---
+import Citation from '../Citation.astro';
+import { calloutStyles } from '../../lib/content';
+import { nl2br } from '../../lib/text';
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+const variant = block.payload.variant ?? 'info';
+const styles = calloutStyles[variant] ?? calloutStyles.info;
+---
+
+<div class={`my-3 rounded-e-xl border-s-4 px-4 py-3 text-sm leading-6 ${styles}`}>
+    <span set:html={nl2br(block.payload.text ?? block.text ?? '')} />
+    <Citation citation={block.citation} class="mt-1 block text-xs opacity-70" />
+</div>

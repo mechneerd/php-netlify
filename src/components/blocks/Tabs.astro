@@ -1,0 +1,24 @@
+---
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+const tabs = block.payload.tabs ?? [];
+---
+
+<div class="my-3 divide-y divide-zinc-800 overflow-hidden rounded-xl border border-zinc-800">
+    {
+        tabs.map((tab) => (
+            <details class="group">
+                <summary class="cursor-pointer list-none bg-zinc-900/60 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-900">
+                    <span class="me-2 inline-block transition group-open:rotate-90">▸</span>
+                    {tab.label}
+                </summary>
+                <div class="px-4 py-3 text-sm leading-6 text-zinc-300" set:html={tab.body.replace(/\r?\n/g, '<br />')} />
+            </details>
+        ))
+    }
+</div>

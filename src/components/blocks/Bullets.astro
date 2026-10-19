@@ -1,0 +1,13 @@
+---
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+---
+
+<ul class="my-3 list-disc space-y-1 ps-6 text-zinc-300">
+    {block.payload.items?.map((item) => <li class="leading-7">{item}</li>)}
+</ul>

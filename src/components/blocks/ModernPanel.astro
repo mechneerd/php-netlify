@@ -1,0 +1,35 @@
+---
+interface Props {
+    book?: string;
+    modern?: string;
+    why?: string;
+}
+
+const { book, modern, why } = Astro.props;
+
+const sections = [
+    { label: 'Book teaches', value: book, icon: '📖' },
+    { label: 'Modern PHP', value: modern, icon: '⚡' },
+    { label: 'Why it matters', value: why, icon: '💡' },
+];
+---
+
+<div class="my-3 overflow-hidden rounded-xl border border-violet-800/60 bg-violet-950/30">
+    <div class="border-b border-violet-800/60 px-4 py-2 text-xs font-semibold tracking-wide text-violet-300 uppercase">
+        Outdated content · surfaced, not hidden
+    </div>
+    <div class="divide-y divide-violet-900/40">
+        {
+            sections
+                .filter((section) => section.value)
+                .map((section) => (
+                    <div class="px-4 py-3">
+                        <p class="text-xs font-semibold text-violet-300">
+                            {section.icon} {section.label}
+                        </p>
+                        <p class="mt-1 text-sm leading-6 text-zinc-300" set:html={section.value?.replace(/\r?\n/g, '<br />')} />
+                    </div>
+                ))
+        }
+    </div>
+</div>

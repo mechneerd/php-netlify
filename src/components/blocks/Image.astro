@@ -1,0 +1,32 @@
+---
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+const payload = block.payload;
+const hasSrc = Boolean(payload.src);
+---
+
+<figure class="my-3 overflow-hidden rounded-xl border border-zinc-700">
+    {
+        hasSrc ? (
+            <img
+                src={payload.src}
+                alt={payload.alt ?? payload.caption ?? `Book figure ${payload.figure_ref}`}
+                width={payload.width}
+                height={payload.height}
+                loading="lazy"
+                class="w-full bg-white"
+            />
+        ) : (
+            <div class="flex aspect-video flex-col items-center justify-center gap-1 bg-zinc-900 text-sm text-zinc-500">
+                <span class="font-medium">Figure {payload.figure_ref ?? '?'}</span>
+                <span class="text-xs">Book figure · PDF {payload.page_pdf ?? '—'}</span>
+            </div>
+        )
+    }
+    {payload.caption && <figcaption class="border-t border-zinc-800 px-4 py-2 text-xs text-zinc-500">{payload.caption}</figcaption>}
+</figure>

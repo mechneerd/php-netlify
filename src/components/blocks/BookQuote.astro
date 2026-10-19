@@ -1,0 +1,18 @@
+---
+import Citation from '../Citation.astro';
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+---
+
+<blockquote class="my-3 rounded-e-xl border-s-4 border-zinc-500 bg-zinc-900 px-4 py-3 text-sm italic leading-7 text-zinc-300">
+    <span set:html={block.payload.text?.replace(/\r?\n/g, '<br />') ?? ''} />
+    <footer class="mt-2 text-xs not-italic text-zinc-500">
+        {block.payload.attribution ?? block.citation ?? 'From the book'}
+    </footer>
+    <Citation citation={block.citation} class="mt-1 block text-xs opacity-70" />
+</blockquote>

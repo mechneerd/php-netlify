@@ -1,0 +1,62 @@
+---
+import { Code } from 'astro:components';
+import Citation from '../Citation.astro';
+import { tierLabels, tierStyles, type Block, type CodeExample } from '../../lib/content';
+
+interface Props {
+    block: Block;
+    example?: CodeExample;
+}
+
+const { block, example } = Astro.props;
+---
+
+{
+    example ? (
+        <>
+            <figure class="group/code my-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+                <figcaption class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 px-4 py-2 text-xs text-zinc-500">
+                    <span class="flex flex-wrap items-center gap-2">
+                        <span class="font-medium text-zinc-200">{example.title}</span>
+                        <span class={`rounded-full px-2 py-0.5 font-medium ${tierStyles[example.tier] ?? tierStyles[1]}`}>
+                            {tierLabels[example.tier] ?? `Tier ${example.tier}`}
+                        </span>
+                        {example.listing_ref && <span class="font-mono">listing {example.listing_ref}</span>}
+                        {example.external_ref && (
+                            <span class="font-mono text-zinc-600" title={`Official companion source: ${example.external_ref}`}>
+                                {example.external_ref.split('/').pop()}
+                            </span>
+                        )}
+                    </span>
+                    <Citation citation={block.citation} />
+                </figcaption>
+                <Code code={example.code} lang="php" theme="github-dark-default" class="bg-zinc-950 p-4 text-sm" />
+                {example.expected_output !== null && (
+                    <div class="border-t border-zinc-800 px-4 py-3">
+                        <p class="mb-1 text-[10px] font-semibold tracking-wide text-zinc-500 uppercase">Output</p>
+                        <pre class="overflow-x-auto font-mono text-sm text-emerald-300">{example.expected_output}</pre>
+                    </div>
+                )}
+            </figure>
+            {example.explanation !== null && (
+                <p class="mt-2 text-sm leading-6 text-zinc-400" set:html={example.explanation.replace(/\r?\n/g, '<br />')} />
+            )}
+            {example.syntax_notes !== null && (
+                <div class="mt-2 rounded-lg bg-zinc-900 px-3 py-2 text-sm leading-6 text-zinc-400">
+                    <span class="font-semibold">Syntax notes:</span>
+                    <span set:html={example.syntax_notes.replace(/\r?\n/g, '<br />')} />
+                </div>
+            )}
+            {example.common_mistake !== null && (
+                <div class="mt-2 rounded-lg border border-amber-800 bg-amber-950/40 px-3 py-2 text-sm leading-6 text-amber-100">
+                    <span class="font-semibold">Common mistake:</span>
+                    <span set:html={example.common_mistake.replace(/\r?\n/g, '<br />')} />
+                </div>
+            )}
+        </>
+    ) : (
+        <div class="rounded-xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-500">
+            Code example #{block.payload.code_example_id ?? '?'} is not linked to this lesson.
+        </div>
+    )
+}

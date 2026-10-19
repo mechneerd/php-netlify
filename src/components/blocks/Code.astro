@@ -1,0 +1,20 @@
+---
+import { Code } from 'astro:components';
+import Citation from '../Citation.astro';
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+const lang = block.payload.lang ?? 'php';
+---
+
+<figure class="group/code my-3 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+    <figcaption class="flex items-center justify-between border-b border-zinc-800 px-4 py-2 text-xs text-zinc-500">
+        <span class="font-mono uppercase">{lang}</span>
+        <Citation citation={block.citation} />
+    </figcaption>
+    <Code code={block.payload.code ?? ''} lang={lang} theme="github-dark-default" class="bg-zinc-950 p-4 text-sm" />
+</figure>

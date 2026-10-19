@@ -1,0 +1,34 @@
+---
+import Citation from '../Citation.astro';
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+const headers = block.payload.headers ?? [];
+const rows = block.payload.rows ?? [];
+---
+
+<figure class="my-3 overflow-x-auto rounded-xl border border-zinc-800">
+    <table class="w-full border-collapse text-sm">
+        <thead>
+            <tr class="border-b border-zinc-800 bg-zinc-900">
+                {headers.map((header) => <th class="px-4 py-2 text-start font-semibold text-zinc-200">{header}</th>)}
+            </tr>
+        </thead>
+        <tbody>
+            {
+                rows.map((row, index) => (
+                    <tr class={index % 2 === 1 ? 'bg-zinc-900/40' : ''}>
+                        {row.map((cell) => (
+                            <td class="border-t border-zinc-800/60 px-4 py-2 align-top text-zinc-300">{cell}</td>
+                        ))}
+                    </tr>
+                ))
+            }
+        </tbody>
+    </table>
+    <Citation citation={block.citation} class="mt-1 block px-4 pb-2 text-xs" />
+</figure>

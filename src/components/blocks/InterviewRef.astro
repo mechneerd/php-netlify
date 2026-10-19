@@ -1,0 +1,12 @@
+---
+import type { Block } from '../../lib/content';
+import RefList from './RefList.astro';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+---
+
+<RefList block={block} labels={block.payload.labels ?? []} />

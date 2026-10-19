@@ -1,0 +1,20 @@
+---
+import type { Block } from '../../lib/content';
+
+interface Props {
+    block: Block;
+}
+
+const { block } = Astro.props;
+---
+
+<ul class="my-3 space-y-1 text-sm text-zinc-300">
+    {
+        (block.payload.items ?? []).map((item) => (
+            <li class="flex items-start gap-2">
+                <span class="mt-1 text-zinc-600">→</span>
+                <span class="leading-6">{item}</span>
+            </li>
+        ))
+    }
+</ul>
